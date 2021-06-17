@@ -1,31 +1,20 @@
 // Application dependency requirements
 const inquirer = require("inquirer");
 const fs = require("fs");
+const util = require("util");
+const generateMarkdown = require("./utils/generateMarkdown.js");
 
 // Inquirer prompt for userResponse data
-inquirer
-    .prompt([
+const questions = [
         {
             type: "input",
             name: "title",
             message: "What is the title of your project?",
-            validate: (answer) => {
-                if (answer.length < 1) {
-                    return console.log("You must enter a project title to continue.");
-                }
-                return true;
-            },
         },
         {
             type: "input",
             name: "description",
             message: "Enter a brief description of your project",
-            validate: (answer) => {
-                if (answer.length < 1) {
-                    return console.log("You must enter a description to continue.");
-                }
-                return true;
-            },
         },
         {
             type: "input",
@@ -39,45 +28,49 @@ inquirer
         },
         {
             type: "input",
-            name: "contributionreq",
+            name: "contribution",
             message: "Enter any instructions for contribution to your project",
+        },
+        {
+            type: "input",
+            name: "tests",
+            message: "Enter any tests you'd like to include in your README for this application",
         },
         {
             type: "list",
             name: "license",
             message: "Choose a license for your project",
-            choices: ["BSD", "MIT", "GPL"],
+            choices: ["BSD", "MIT", "GPL", "Unlicensed"],
         },
         {
-            
+            type: "input",
+            name: "github",
+            message: "What is your GitHub username?",
+        },
+        {
+            type: "input",
+            name: "email",
+            message: "What is your email address?",
         }
-    ])
-
-// Generate readme function
-const genReadme = (userResponse) => {
-    `# ${userResponse.title}
-    
-    ## Description
-
-    ${userResponse.description}
-
-    ## Table of Contents
-
-    - [Installation](#installation)
-    - [Usage](#usage)
-    - [Contribution](#contribution)
-    - [Credits](#credits)
-    - [License](#license)
-
-    ## Installation
-
-    ${userResponse.installation}
+    ];
 
 
-    `
+
+function init() {
+
+// Writes the markdown output to a .md file
+inquirer
+    .prompt(questions)
+    .then(function (data) {
+        fs.writeFile(`${data.title}-README.md`, generateMarkdown(data), function (err) {
+            if (err) {
+                throw err;
+            } else {
+                console.log("README has been generated successfully.")
+            }
+        })
+    });
+
 };
-// TODO: Create a function to initialize app
-function init() {}
 
-// Function call to initialize app
 init();
